@@ -13,8 +13,8 @@ export async function getAllNotes(req,res){
 
 export async function createNote(req,res){
     try{
-        const {title,content} = req.body
-        const note = new Note({title,content})
+        const {title,content,dueDate} = req.body
+        const note = new Note({title,content,dueDate})
         const savedNote = await note.save();
         res.status(201).json(savedNote)        
     } catch(error){
@@ -48,13 +48,13 @@ export async function deleteNote(req,res){
 
 export async function updateNote(req,res){
     try{
-        const {title,content}=req.body
-        const updatedNote= await Note.findByIdAndUpdate(req.params.id,{title,content},{
+        const {title,content,dueDate}=req.body
+        const updatedNote= await Note.findByIdAndUpdate(req.params.id,{title,content,dueDate},{
             new:true,
         });
 
         if (!updatedNote) return res.status(404).json({messgae:"note not found"})
-        res.status(200).json(updatedNote)
+        res.status(200).json({updatedNote})
     } catch(error){
          console.error("Error in updateNote controller", error);
          res.status(500).json({message:"Internal server error"});

@@ -10,6 +10,10 @@ const NoteSchema = new mongoose.Schema(
             type:String,
             required:true
         },
+        dueDate:{
+            type:Date,
+            required:true
+        },
     },
     {timestamps:true}
 );
