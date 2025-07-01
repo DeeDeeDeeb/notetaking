@@ -66,15 +66,27 @@ function App() {
     }
   }
 
+  const daysleft = (dueDate) => {
+    const today = new Date()
+    const due = new Date(dueDate)
+    const left = (due - today)/(1000*60*60*24)
+    if (left <= 0) return 100;
+    const maxsize = 10
+    const percentage = (1 - Math.min(left, maxsize) / maxsize) * 100;
+    return Math.round(percentage)
+  }
+
+
+
 
   return (
     <div className="min-h-screen bg-gray-500 flex items-center justify-center p-6 ">      
-        <div className=" w-full max-w-3xl space-y-6">
+      <div className=" w-full max-w-3xl space-y-6">
           <div className='bg-gray-200 p-4 rounded-b-md shadow'>
             <div className='flex space-x-10'>
               <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className='w-2/3 mb-2 p-2 rounded border border-gray-300' placeholder='Task'/><br/>
               <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className='mb-2' required placeholder='Duedate'/>
-              <button onClick={handleCreate} className= "justify-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create</button>
+              <button onClick={handleCreate} className= " bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create</button>
             </div>
               <textarea value={note}  onChange={(e) => setNote(e.target.value)} className="w-full p-3 h-24 rounded border border-gray-300" placeholder="Description"/>
             </div>
@@ -85,8 +97,7 @@ function App() {
           ) : (
             <ul className="space-y-3">
               {notes.map((note) => (
-                <li key={note._id} className="bg-gray-200 p-3 rounded flex justify-between items-center">
-                  
+                <li key={note._id} className="bg-gray-200 p-3 rounded flex justify-between items-center group">   
                   <div>
                     {editingId === note._id ? (
                       <div>
@@ -98,13 +109,15 @@ function App() {
                       </div>) : (
                         <div>
                           <h2 className="font-semibold text-gray-800">{note.title}</h2>
-                          <p className="text-gray-700">{note.content}</p>
+                          <p className="text-gray-700 opacity-0 group-hover:opacity-100 transition duration-200">{note.content}</p>
+                          <progress value ={daysleft(note.dueDate)} max={100} className='w-full h-2'/>
                           <p className='text-gray-500'> Due: { note.dueDate ? new Date(note.dueDate).toLocaleDateString('en-GB') : "No due date"}</p>
                         </div>)}
                     </div>
-                  
-                  <button onClick={() => handleEdit(note)} className="text-blue-600 font-bold text-lg hover:text-blue-800 mr-4">edit</button>
-                  <button onClick={() => handleDelete(note._id)} className="text-red-600 font-bold text-lg hover:text-red-800">delete</button>
+                  <div className='flex space-x-5'>
+                    <button onClick={() => handleEdit(note)} className="text-blue-600 font-bold text-lg hover:text-blue-800">edit</button>
+                    <button onClick={() => handleDelete(note._id)} className="text-red-600 font-bold text-lg hover:text-red-800">delete</button>
+                  </div>
                 </li>
               ))}
             </ul>
