@@ -13,16 +13,35 @@ function App() {
   const[dueDate, setDueDate] = useState('')
   const[editDueDate, setEditDueDate ] = useState('')
 
-  useEffect(() => {
-    fetch(`${API}/api/notes`).then((res) => res.json()).then((data) => setNotes(data))
-    .catch((err) => console.error("Error",err))
+  useEffect(() => { 
+    const fetchNotes = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return; 
+      try {
+        const res = await fetch(`${API}/api/notes`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setNotes(data);
+        } else {
+          console.error("Fetch failed:", data.message);
+        }
+      } catch (err) {
+        console.error("Error", err);
+      }
+  };
+  fetchNotes();
   },[])
 
   const handleCreate = async() => {
     if(!title || !note) return;
     const newNote = {title, content: note, dueDate}
     try{
-      const res = await fetch(`${API}/api/notes`,{method: 'POST', headers:{'Content-Type':'application/json'},body:JSON.stringify(newNote)})
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API}/api/notes`,{method: 'POST', headers:{'Content-Type':'application/json','Authorization': `Bearer ${token}`},body:JSON.stringify(newNote)})
       const savedNote = await res.json()
       setNotes([savedNote, ...notes]);
       setTitle('');
@@ -35,6 +54,7 @@ function App() {
 
   const handleDelete = async(id) => {
     try{
+      const token = localStorage.getItem('token');
       await fetch(`${API}/api/notes/${id}`,{method:'DELETE'})
       setNotes(notes.filter((note) => note._id !== id))
     } catch (error) {
@@ -52,7 +72,8 @@ function App() {
 
   const handleEditSave = async () =>{
     try{
-      const res = await fetch(`${API}/api/notes/${editingId}`,{method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title: editTitle, content:editContent,dueDate: editDueDate })})
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API}/api/notes/${editingId}`,{method:'PUT', headers:{'Content-Type':'application/json','Authorization': `Bearer ${token}`}, body:JSON.stringify({title: editTitle, content:editContent,dueDate: editDueDate })})
       const updatedNote = await res.json()
       setNotes(notes.map((note) => 
         note._id === editingId ? updatedNote : note

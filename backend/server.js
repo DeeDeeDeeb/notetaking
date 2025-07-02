@@ -4,6 +4,8 @@ import cors from "cors"
 import dotenv from "dotenv"
 import {connectDB} from "../backend/config/db.js"
 import noteRoutes from "../backend/routes/noteRoutes.js"
+import userRoutes from "../backend/routes/userRoutes.js"
+
 
 
 dotenv.config()
@@ -17,6 +19,7 @@ connectDB()
 app.use(cors())
 app.use(express.json())
 
+app.use("/api/users",userRoutes)
 app.use("/api/notes",noteRoutes)
 
 
