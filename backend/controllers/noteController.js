@@ -7,18 +7,16 @@ export async function createUser(req,res){
     console.log("received",req.body)
     try{
         const{username, email, password} = req.body
+        const existing = await User.findOne({email})
+        if (existing) return res.status(400).json({message:"User exists"})
         const newUser= new User({username,email,password})
         const savedUser = await newUser.save()
-        res.status(201).json(savedUser)
+
+        const token = jwt.sign({ userId: savedUser._id }, process.env.JWT_SECRET, {expiresIn: "1h",});
+        res.status(201).json({ token, user :savedUser})
     } catch(error){
-        if (error.code === 11000){
-            const duplicateField = Object.keys(error.keyValue)[0];
-            res.status(400).json({ message: `${duplicateField} already exists. Please choose another.` });
-        } else{
             console.error("Error in createUser",error)
             res.status(500).json({message:"Internal server"})
-        }
-        
     }
 }
 
@@ -82,18 +80,25 @@ export async function getNoteById(req,res){
     try{
         const note = await Note.findById(req.params.id);
         if (!note) return res.status(404).json({message:"Note not found"});
+        if (note.userId.toString() !== req.user.userId) {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
         res.json(note)
     }catch(error){
-        console.error("Error in createNote controller", error);
+        console.error("Error in getNotrById controller", error);
         res.status(500).json({message:"Internal server error"});
     }
 }
 
 export async function deleteNote(req,res){
     try{
+        const note = await Note.findById(req.params.id);
+        if (!note) return res.status(404).json({message: "Note not found"});
+        if (note.userId.toString() !== req.user.userId) {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
         const deletedNote = await Note.findByIdAndDelete(req.params.id)
-        if (!deletedNote) return res.status(404).json({message: "Note not found"});
-        res.status(200).json({message:"Note deleted successfully"})
+        res.status(200).json({deletedNote, message:"Note deleted successfully"})
 } catch (error) {
     console.error("Error in deletedNote controller", error);
     res.status(500).json({message:"Internal server error"});
@@ -103,13 +108,19 @@ export async function deleteNote(req,res){
 
 export async function updateNote(req,res){
     try{
-        const {title,content,dueDate}=req.body
-        const updatedNote= await Note.findByIdAndUpdate(req.params.id,{title,content,dueDate},{
-            new:true,
-        });
+        const note = await Note.findById(req.params.id);
+        if (!note) return res.status(404).json({ message: "Note not found" });
 
-        if (!updatedNote) return res.status(404).json({messgae:"note not found"})
-        res.status(200).json(updatedNote)
+        if (note.userId.toString() !== req.user.userId) {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
+        const {title,content,dueDate}=req.body
+        note.title = title;
+        note.content = content;
+        note.dueDate = dueDate;
+
+        const updatedNote = await note.save();
+         res.status(200).json(updatedNote);
     } catch(error){
          console.error("Error in updateNote controller", error);
          res.status(500).json({message:"Internal server error"});

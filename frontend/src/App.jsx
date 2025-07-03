@@ -107,7 +107,7 @@ function App() {
             <div className='flex space-x-10'>
               <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className='w-2/3 mb-2 p-2 rounded border border-gray-300' placeholder='Task'/><br/>
               <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className='mb-2' required placeholder='Duedate'/>
-              <button onClick={handleCreate} className= " bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create</button>
+              <button onClick={handleCreate} className= "font-bold py-2 px-4 rounded">Create</button>
             </div>
               <textarea value={note}  onChange={(e) => setNote(e.target.value)} className="w-full p-3 h-24 rounded border border-gray-300" placeholder="Description"/>
             </div>

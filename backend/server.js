@@ -2,13 +2,15 @@ import express from "express"
 import mongoose from "mongoose"
 import cors from "cors"
 import dotenv from "dotenv"
-import {connectDB} from "../backend/config/db.js"
-import noteRoutes from "../backend/routes/noteRoutes.js"
-import userRoutes from "../backend/routes/userRoutes.js"
+import {connectDB} from "./config/db.js"
+import noteRoutes from "./routes/noteRoutes.js"
+import userRoutes from "./routes/userRoutes.js"
 
 
 
 dotenv.config()
+console.log("JWT_SECRET from env:", process.env.JWT_SECRET);
+
 
 
 const app = express()

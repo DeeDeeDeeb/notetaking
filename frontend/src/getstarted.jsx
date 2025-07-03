@@ -21,10 +21,11 @@ function Getstarted() {
   
     try {
       console.log(JSON.stringify(formData));
-      const response = await fetch(`${API}/api/users`, {method: 'POST',headers:{'Content-Type': 'application/json',},body: JSON.stringify(formData)});
+      const response = await fetch(`${API}/api/users/signup`, {method: 'POST',headers:{'Content-Type': 'application/json',},body: JSON.stringify(formData)});
       if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.token); 
         alert('Account created successfully!');
-        e.target.reset();
         navigate('/');
       } else {
         const data = await response.json();
