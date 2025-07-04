@@ -13,7 +13,7 @@ export async function createUser(req,res){
         const savedUser = await newUser.save()
 
         const token = jwt.sign({ userId: savedUser._id, username:savedUser.username}, process.env.JWT_SECRET, {expiresIn: "1h",});
-        res.status(201).json({ token, user :savedUser})
+        res.status(201).json({ token, user :savedUser, username: savedUser.username})
     } catch(error){
             console.error("Error in createUser",error)
             res.status(500).json({message:"Internal server"})
@@ -31,7 +31,7 @@ export async function loginUser(req,res) {
             return res.status(400).json({message:"incorrect password"})
         }
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.status(200).json({ token, message: 'Login successful' });
+        res.status(200).json({ token, username:user.username, message: 'Login successful'});
     } catch (err) {
         console.error("Error:", err);
         res.status(500).json({ message: 'Server error' });

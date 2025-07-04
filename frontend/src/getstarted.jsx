@@ -25,6 +25,7 @@ function Getstarted() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.token); 
+        localStorage.setItem('username',data.username);
         alert('Account created successfully!');
         navigate('/');
       } else {

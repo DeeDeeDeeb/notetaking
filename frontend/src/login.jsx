@@ -22,7 +22,9 @@ function Login() {
         if (response.ok){
             alert("Login successful")
             console.log("JWT TOKEN", data.token)
+            console.log("username from server",data.username)
             localStorage.setItem('token',data.token)
+            localStorage.setItem('username',data.username)
             navigate('/')
         } else {
             setError(data.message)
