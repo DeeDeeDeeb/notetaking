@@ -12,7 +12,7 @@ export async function createUser(req,res){
         const newUser= new User({username,email,password})
         const savedUser = await newUser.save()
 
-        const token = jwt.sign({ userId: savedUser._id }, process.env.JWT_SECRET, {expiresIn: "1h",});
+        const token = jwt.sign({ userId: savedUser._id, username:savedUser.username}, process.env.JWT_SECRET, {expiresIn: "1h",});
         res.status(201).json({ token, user :savedUser})
     } catch(error){
             console.error("Error in createUser",error)
